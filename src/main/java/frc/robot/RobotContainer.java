@@ -4,15 +4,12 @@
 
 package frc.robot;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -26,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CameraConstants;
@@ -36,9 +32,7 @@ import frc.robot.commands.Arm.CheckArmAtTarget;
 import frc.robot.commands.Drive.AlignTargetOdometry;
 import frc.robot.commands.Drive.AlignTargetOdometryLob;
 import frc.robot.commands.Drive.AlignToNote;
-import frc.robot.commands.Drive.AutoPickupNote;
 import frc.robot.commands.Drive.TeleopSwerve;
-import frc.robot.commands.Drive.WheelRadiusCharacterization;
 import frc.robot.commands.Shooter.CheckShooterAtSpeed;
 import frc.robot.commands.Shooter.LobShoot;
 import frc.robot.commands.Shooter.ShootFromDistance;
@@ -345,13 +339,20 @@ public class RobotContainer implements Logged {
 
         private void registerNamedCommands() {
 
+                NamedCommands.registerCommand("ResetAll", new ParallelCommandGroup(
+                                m_shooter.stopShooterCommand(),
+                                m_intake.stopIntakeCommand(),
+                                m_transfer.stopTransferCommand(),
+                                m_arm.setGoalCommand(ArmConstants.pickupAngle).asProxy()));
+
                 NamedCommands.registerCommand("Arm Before Note 2", m_cf.positionArmRunShooterSpecialCase(44,
                                 3000).asProxy());
 
                 NamedCommands.registerCommand("Arm Note 2", m_cf.positionArmRunShooterSpecialCase(35,
                                 3200).asProxy());
 
-                NamedCommands.registerCommand("Halt Intake", m_intake.stopIntakeCommand().asProxy());
+                // NamedCommands.registerCommand("Halt Intake",
+                // m_intake.stopIntakeCommand().asProxy());
 
                 NamedCommands.registerCommand("Prestart Shooter Wheels", m_shooter.startShooterCommand(4000).asProxy());
 
@@ -359,6 +360,9 @@ public class RobotContainer implements Logged {
 
                 NamedCommands.registerCommand(
                                 "Start Intake", m_intake.startIntakeCommand().asProxy());
+
+                NamedCommands.registerCommand(
+                                "DoIntake", m_cf.doIntake().asProxy());
 
                 NamedCommands.registerCommand(
                                 "Transfer To Sensor", m_cf.runToSensorCommand().asProxy());
@@ -432,22 +436,22 @@ public class RobotContainer implements Logged {
                 autoChooser = AutoBuilder.buildAutoChooser();
 
                 // autoChooser.addOption("Source 2 with Vision",
-                //                 new SequentialCommandGroup(
-                //                                 m_cf.positionArmRunShooterSpecialCase(Constants.subwfrArmAngle,
-                //                                                 Constants.subwfrShooterSpeed),
-                //                                 m_transfer.transferToShooterCommand(),
-                //                                 AutoBuilder.followPath(PathPlannerPath
-                //                                                 .fromPathFile("Source To Near Center 4")),
-                //                                 new ParallelCommandGroup(m_cf.autopickup(),
-                //                                                 m_intake.startIntakeCommand(),
-                //                                                 m_arm.setGoalCommand(ArmConstants.pickupAngle),
-                //                                                 m_cf.runToSensorCommand()),
-                //                                 AutoBuilder.followPath(m_swerve.getPathToNearSource()),
-                //                                 AutoBuilder.followPath(
-                //                                                 PathPlannerPath.fromPathFile("Near Center 4 to Shoot")),
-                //                                 m_cf.positionArmRunShooterSpecialCase(Constants.shotSourceAngle,
-                //                                                 Constants.shotSourceSpeed),
-                //                                 m_transfer.transferToShooterCommand()));
+                // new SequentialCommandGroup(
+                // m_cf.positionArmRunShooterSpecialCase(Constants.subwfrArmAngle,
+                // Constants.subwfrShooterSpeed),
+                // m_transfer.transferToShooterCommand(),
+                // AutoBuilder.followPath(PathPlannerPath
+                // .fromPathFile("Source To Near Center 4")),
+                // new ParallelCommandGroup(m_cf.autopickup(),
+                // m_intake.startIntakeCommand(),
+                // m_arm.setGoalCommand(ArmConstants.pickupAngle),
+                // m_cf.runToSensorCommand()),
+                // AutoBuilder.followPath(m_swerve.getPathToNearSource()),
+                // AutoBuilder.followPath(
+                // PathPlannerPath.fromPathFile("Near Center 4 to Shoot")),
+                // m_cf.positionArmRunShooterSpecialCase(Constants.shotSourceAngle,
+                // Constants.shotSourceSpeed),
+                // m_transfer.transferToShooterCommand()));
 
                 Shuffleboard.getTab("Autonomous").add("AutoSelection", autoChooser)
                                 .withSize(3, 1).withPosition(0, 0);

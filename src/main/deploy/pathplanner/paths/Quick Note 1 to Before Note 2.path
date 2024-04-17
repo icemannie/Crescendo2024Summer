@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "SubWfrQuick",
+  "folder": null,
   "previewStartingState": {
     "rotation": -151.7,
     "velocity": 0

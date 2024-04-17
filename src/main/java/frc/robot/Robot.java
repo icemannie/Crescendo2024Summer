@@ -5,22 +5,23 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import org.littletonrobotics.urcl.URCL;
+
 import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.utils.LLPipelines;
-import monologue.Monologue;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import monologue.Monologue;
 
 public class Robot extends TimedRobot implements Logged {
 
@@ -34,7 +35,8 @@ public class Robot extends TimedRobot implements Logged {
 
   private double m_startDelay;
 
-  @Log.NT.Once  private double startTime;
+  @Log.NT.Once
+  private double startTime;
 
   private boolean autoHasRun;
 
@@ -45,7 +47,7 @@ public class Robot extends TimedRobot implements Logged {
     if (RobotBase.isReal()) {
       DataLogManager.start();
       DriverStation.startDataLog(DataLogManager.getLog());
-
+      URCL.start();
     }
 
     m_robotContainer = new RobotContainer();
@@ -55,8 +57,8 @@ public class Robot extends TimedRobot implements Logged {
     // Shuffleboard.selectTab("Autonomous");
     Monologue.setupMonologue(m_robotContainer, "/Monologue", false, true);
 
-   DriverStation.startDataLog(DataLogManager.getLog());
-   // Monologue.setupMonologue(this, "/Monologue", false, true);
+    DriverStation.startDataLog(DataLogManager.getLog());
+    // Monologue.setupMonologue(this, "/Monologue", false, true);
   }
 
   @Override

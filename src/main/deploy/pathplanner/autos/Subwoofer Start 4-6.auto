@@ -36,19 +36,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Arm To Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Transfer To Sensor"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Intake"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -92,13 +80,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Arm To Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Transfer To Sensor"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -129,13 +111,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Arm To Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Transfer To Sensor"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -167,39 +143,14 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Arm To Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Transfer Stop"
-                }
-              }
-            ]
+            "name": "ResetAll"
           }
         }
       ]
     }
   },
-  "folder": "SubWfrStart",
+  "folder": null,
   "choreoAuto": false
 }

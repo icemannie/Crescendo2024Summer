@@ -91,7 +91,8 @@ public class SwerveModule extends SubsystemBase {
     lastAngle = getState().angle;
 
     driveFeedforward = new SimpleMotorFeedforward(
-        SwerveConstants.driveKS, SwerveConstants.driveKV, SwerveConstants.driveKA);
+        SwerveConstants.driveKS[moduleNumber], SwerveConstants.driveKV[moduleNumber],
+        SwerveConstants.driveKA[moduleNumber]);
 
   }
 
@@ -112,7 +113,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = ((m_turnCancoder.getAbsolutePosition().getValueAsDouble() * 360)); // -angleOffset
+    double angle = (m_turnCancoder.getAbsolutePosition().getValueAsDouble() * 360);
     integratedAngleEncoder.setPosition(angle);
   }
 
@@ -160,7 +161,7 @@ public class SwerveModule extends SubsystemBase {
     driveController.setI(Constants.SwerveConstants.driveKI);
     driveController.setD(Constants.SwerveConstants.driveKD);
     driveController.setFF(Constants.SwerveConstants.driveKFF);// 3.24=max speed
-    driveController.setP(0.35 , 1);
+    driveController.setP(0.35, 1);
     driveController.setI(0, 1);
     driveController.setD(0, 1);
     driveController.setFF(0, 1);
@@ -212,7 +213,6 @@ public class SwerveModule extends SubsystemBase {
       if (!feedforward) {
         driveController.setReference(desiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
       } else {
-
         double feedForward = driveFeedforward.calculate(
             desiredState.speedMetersPerSecond,
             (desiredState.speedMetersPerSecond - previousState.speedMetersPerSecond) / 0.020);

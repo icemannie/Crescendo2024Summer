@@ -5,13 +5,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.List;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.Matrix;
@@ -29,11 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.StringLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -54,8 +44,8 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.Pref;
 import frc.robot.utils.AllianceUtil;
+import frc.robot.utils.LimelightTagsUpdate;
 import monologue.Annotations.Log;
-import monologue.LogLevel;
 import monologue.Logged;
 
 public class SwerveSubsystem extends SubsystemBase implements Logged {
@@ -148,6 +138,9 @@ public class SwerveSubsystem extends SubsystemBase implements Logged {
 
   @Log.NT(key = "noteseentime")
   private double noteSeenTime;
+
+  LimelightTagsUpdate flUpdate = new LimelightTagsUpdate(CameraConstants.frontLeftCamera.camname, this, true);
+  LimelightTagsUpdate frUpdate = new LimelightTagsUpdate(CameraConstants.frontRightCamera.camname, this, true);
 
   public SwerveSubsystem(boolean showScreens) {
     m_showScreens = showScreens;
@@ -305,13 +298,16 @@ public class SwerveSubsystem extends SubsystemBase implements Logged {
   }
 
   // public PathPlannerPath getPathToNearSource() {
-  //   List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-  //     new Pose2d(getPose().getTranslation().getX(), getPose().getTranslation().getY(), Rotation2d.fromDegrees(180)),
-  //     new Pose2d(6.79, 1.60, Rotation2d.fromDegrees(180))
-  //   );
-  //   PathPlannerPath path = new PathPlannerPath(bezierPoints, new PathConstraints(3.0, 3.0, 2 * Math.PI, 3 * Math.PI), new GoalEndState(0.0, Rotation2d.fromDegrees(180)));
-  //   path.preventFlipping = false; 
-  //   return path;
+  // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+  // new Pose2d(getPose().getTranslation().getX(),
+  // getPose().getTranslation().getY(), Rotation2d.fromDegrees(180)),
+  // new Pose2d(6.79, 1.60, Rotation2d.fromDegrees(180))
+  // );
+  // PathPlannerPath path = new PathPlannerPath(bezierPoints, new
+  // PathConstraints(3.0, 3.0, 2 * Math.PI, 3 * Math.PI), new GoalEndState(0.0,
+  // Rotation2d.fromDegrees(180)));
+  // path.preventFlipping = false;
+  // return path;
   // }
 
   public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
@@ -530,6 +526,10 @@ public class SwerveSubsystem extends SubsystemBase implements Logged {
     return gyro.getRoll();
   }
 
+  public double getGyroRate() {
+    return gyro.getRate();
+  }
+
   public Field2d getField() {
     return field;
   }
@@ -555,178 +555,22 @@ public class SwerveSubsystem extends SubsystemBase implements Logged {
 
     loopctr++;
 
-    // getPose();
-
     swervePoseEstimator.update(getYaw(), getPositions());
 
     getPose();
 
     putStates();
 
-    // doNoteVisionCorrection();
+    flUpdate.execute();
 
-    if (firstTime && isStopped())
-      firstTime = false;
+    frUpdate.execute();
 
-    boolean leftHasTarget = CameraConstants.frontLeftCamera.isActive
-        && LimelightHelpers.getTV(CameraConstants.frontLeftCamera.camname);
-
-    if (leftHasTarget)
-      doVisionValuesFL();
-
-    boolean rightHasTarget = CameraConstants.frontRightCamera.isActive
-        && LimelightHelpers.getTV(CameraConstants.frontRightCamera.camname);
-
-    if (rightHasTarget)
-      doVisionValuesFR();
   }
-  
 
   @Log.NT(key = "SpeakerDistance")
   public double getDistanceFromSpeaker() {
     return Constants.getActiveSpeakerPose().getTranslation()
         .getDistance(getPose().getTranslation());
-  }
-
-  @Log.NT(key = "FL_Pose")
-  private Pose2d getLLPoseFL() {
-    return LimelightHelpers
-        .getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).pose;
-  }
-
-  @Log.NT(key = "FL_NumTargets")
-  private int getNumberTargetsFL() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).tagCount;
-  }
-
-  @Log.NT(key = "FL_Area")
-  private double getAreaFL() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).avgTagArea;
-  }
-
-  @Log.NT(key = "FL_Dist")
-  private double getDistanceFL() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).avgTagDist;
-  }
-
-  @Log.NT(key = "FL_Timestamp")
-  private double getTimestampFL() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).timestampSeconds;
-  }
-
-  @Log.NT(key = "FL_PoseDifference")
-  private double getPoseDifferenceFL() {
-    return getPose().getTranslation()
-        .getDistance(getLLPoseFL().getTranslation());
-  }
-
-  private void doVisionValuesFL() {
-    numberTargets = getNumberTargetsFL();
-    area = getAreaFL();
-    llpose = getLLPoseFL();
-    timestampSeconds = getTimestampFL();
-    tagDistance = getDistanceFL();
-    if (!AllianceUtil.isRedAlliance()) {
-      Translation2d t2d = llpose.getTranslation();
-      Rotation2d r = llpose.getRotation();
-      Rotation2d r180 = r.rotateBy(new Rotation2d(0)); // Didn't need to rotate robot. This might be alliance specific?
-      llpose = new Pose2d(t2d, r180);
-    }
-    // if (llpose.getX() == 0.0
-    // || llpose.getX() > FieldConstants.FIELD_LENGTH
-    // || llpose.getY() < 0.0
-    // || llpose.getY() > FieldConstants.FIELD_WIDTH)
-    // return;
-
-    // distance from current pose to vision estimated pose
-    poseDifference = getPoseDifferenceFL();
-
-    if (cameraSelection.intValue() == 1 || cameraSelection.intValue() == 3
-        || DriverStation.isTeleopEnabled() || DriverStation.isDisabled()) {
-      double xyStds = .3;
-      double radStds = .8;
-      swervePoseEstimator.setVisionMeasurementStdDevs(
-          VecBuilder.fill(xyStds, xyStds, radStds));
-      if ((numberTargets > 1 && poseDifference < 2) || tagDistance < 8 || poseDifference < 0.5 || area > 0.3) {
-
-        SmartDashboard.putNumber("VOL", timestampSeconds);
-        swervePoseEstimator.addVisionMeasurement(
-            llpose,
-            timestampSeconds);
-
-      }
-    }
-
-  }
-
-  @Log.NT(key = "FR_Pose")
-  private Pose2d getLLPoseFR() {
-    return LimelightHelpers
-        .getBotPoseEstimate_wpiBlue(CameraConstants.frontRightCamera.camname).pose;
-  }
-
-  @Log.NT(key = "FR_NumTargets")
-  private int getNumberTargetsFR() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontRightCamera.camname).tagCount;
-  }
-
-  @Log.NT(key = "FR_Area")
-  private double getAreaFR() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontRightCamera.camname).avgTagArea;
-  }
-
-  @Log.NT(key = "FR_Dist")
-  private double getDistanceFR() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontRightCamera.camname).avgTagDist;
-  }
-
-  @Log.NT(key = "FR_Timestamp")
-  private double getTimestampFR() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.frontLeftCamera.camname).timestampSeconds;
-  }
-
-  @Log.NT(key = "FR_PoseDifference")
-  private double getPoseDifferenceFR() {
-    return swervePoseEstimator.getEstimatedPosition().getTranslation()
-        .getDistance(getLLPoseFR().getTranslation());
-  }
-
-  private void doVisionValuesFR() {
-    numberTargets = getNumberTargetsFR();
-    area = getAreaFR();
-    llpose = getLLPoseFR();
-    timestampSeconds = getTimestampFR();
-    tagDistance = getDistanceFR();
-    if (!AllianceUtil.isRedAlliance()) {
-      Translation2d t2d = llpose.getTranslation();
-      Rotation2d r = llpose.getRotation();
-      Rotation2d r180 = r.rotateBy(new Rotation2d(0)); // Didn't need to rotate robot. This might be alliance specific?
-      llpose = new Pose2d(t2d, r180);
-    }
-    if (llpose.getX() == 0.0
-        || llpose.getX() > FieldConstants.FIELD_LENGTH
-        || llpose.getY() < 0.0
-        || llpose.getY() > FieldConstants.FIELD_WIDTH)
-      return;
-
-    // distance from current pose to vision estimated pose
-    poseDifference = getPoseDifferenceFR();
-
-    if (cameraSelection.intValue() == 2 || cameraSelection.intValue() == 3
-        || DriverStation.isTeleopEnabled() || DriverStation.isDisabled()) {
-      double xyStds = .3;
-      double radStds = .8;
-      swervePoseEstimator.setVisionMeasurementStdDevs(
-          VecBuilder.fill(xyStds, xyStds, radStds));
-      if ((numberTargets > 1 && poseDifference < 2) || tagDistance < 8 || poseDifference < 0.5 || area > 0.3) {
-        SmartDashboard.putNumber("VOR", timestampSeconds);
-
-        swervePoseEstimator.addVisionMeasurement(
-            llpose,
-            timestampSeconds);
-
-      }
-    }
   }
 
   public void doNoteVisionCorrection() {

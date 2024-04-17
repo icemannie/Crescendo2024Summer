@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -92,7 +91,7 @@ public final class Constants {
 
                 /* Swerve Current Limiting */
                 public static final int angleContinuousCurrentLimit = 20;
-                public static final int driveContinuousCurrentLimit = 40; //60
+                public static final int driveContinuousCurrentLimit = 40; // 60
 
                 /* Swerve Profiling Values */
                 public static final double kmaxTheoreticalSpeed = 4.6; // 3.7;// mps *1.2 L2
@@ -114,9 +113,9 @@ public final class Constants {
                 public static final double driveKFF = .5 / kmaxTheoreticalSpeed;
 
                 /* Drive Motor Characterization Values */
-                public static final double driveKS = 0.60; //0.25 55
-                public static final double driveKV = 2.70;// 2.5636; //2.59 //2.55 2.8
-                public static final double driveKA = 0.59; /// 0.4 0.59
+                public static final double[] driveKS = { 0.60, .6, .6, .6 }; // 0.25 55
+                public static final double[] driveKV = { 2.70, 2.70, 2.70, 2.70 };// 2.5636; //2.59 //2.55 2.8
+                public static final double[] driveKA = { 0.59, .59, .59, .59 }; /// 0.4 0.59
 
                 /* Drive Motor Conversion Factors */
                 public static final double driveConversionPositionFactor = (wheelDiameter.magnitude() * Math.PI)
@@ -228,9 +227,8 @@ public final class Constants {
                 public static final Pose2d speakerBlueAlliance = new Pose2d(0.0, 5.5, Rotation2d.fromDegrees(0.0));
                 public static final Pose2d speakerRedAlliance = new Pose2d(16.54, 5.5, Rotation2d.fromDegrees(180.0));
 
-                 public static final Pose2d lobBlueAlliance = new Pose2d(0.0, 7.1, Rotation2d.fromDegrees(0.0));
+                public static final Pose2d lobBlueAlliance = new Pose2d(0.0, 7.1, Rotation2d.fromDegrees(0.0));
                 public static final Pose2d lobRedAlliance = new Pose2d(16.54, 7.1, Rotation2d.fromDegrees(180.0));
-
 
                 public static Pose2d driverStationBlueAlliance = new Pose2d();
                 public static Pose2d driverStationRedAlliance = new Pose2d();
@@ -256,7 +254,7 @@ public final class Constants {
 
         }
 
-         public static Pose2d getActiveLobPose() {
+        public static Pose2d getActiveLobPose() {
                 if (DriverStation.getAlliance().isPresent()
                                 && DriverStation.getAlliance().get() == Alliance.Red)
                         return FieldConstants.lobRedAlliance;
@@ -500,7 +498,8 @@ public final class Constants {
 
         public static final class ArmConstants {
 
-                public static final double cancoderOffsetRadians = Units.degreesToRadians(17); // This measurement works 18?
+                public static final double cancoderOffsetRadians = Units.degreesToRadians(17); // This measurement works
+                                                                                               // 18?
 
                 public static final double maxarmMotorRPM = 5700;
 
@@ -559,7 +558,7 @@ public final class Constants {
                 public static final double transferConversionPositionFactor = 1;
                 public static final double voltageComp = 12;
                 public static final IdleMode transferIdleMode = IdleMode.kBrake;
-                public static final int transferContinuousCurrentLimit = 40; 
+                public static final int transferContinuousCurrentLimit = 40;
                 public static double clearShooterTime = 0.6;
                 public static double noNoteStopTime = 20;
                 public static double jogSpeed = 1;

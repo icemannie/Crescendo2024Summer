@@ -43,19 +43,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Arm To Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Transfer To Sensor"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -87,12 +75,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Arm To Intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -105,7 +87,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Transfer To Sensor"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -136,13 +118,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Transfer To Sensor"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Arm To Intake"
+                  "name": "DoIntake"
                 }
               }
             ]
@@ -176,6 +152,6 @@
       ]
     }
   },
-  "folder": "SubWfrStart",
+  "folder": null,
   "choreoAuto": false
 }

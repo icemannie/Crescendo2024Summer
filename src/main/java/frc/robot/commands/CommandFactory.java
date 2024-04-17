@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.LimelightHelpers;
 import frc.robot.commands.Arm.CheckArmAtTarget;
@@ -75,7 +76,7 @@ public class CommandFactory {
                                 m_arm.setGoalCommand(Units.degreesToRadians(armAngleDeg)),
                                 m_shooter.startShooterCommand(shooterSpeed),
                                 new CheckArmAtTarget(m_arm),
-                                //m_shooter.startShooterCommand(shooterSpeed),
+                                // m_shooter.startShooterCommand(shooterSpeed),
                                 new CheckShooterAtSpeed(m_shooter, .2));
         }
 
@@ -87,8 +88,15 @@ public class CommandFactory {
                                 new CheckShooterAtSpeed(m_shooter, .2));
         }
 
+        public Command doIntake() {
+                return new ParallelCommandGroup(
+                                m_intake.startIntakeCommand(),
+                                m_arm.setGoalCommand(ArmConstants.pickupAngle),
+                                new TransferIntakeToSensor(m_transfer, m_intake));
+        }
+
         public Command runToSensorCommand() {
-                return new TransferIntakeToSensor(m_transfer,m_intake);
+                return new TransferIntakeToSensor(m_transfer, m_intake);
         }
 
         public Command alignShootCommand() {
